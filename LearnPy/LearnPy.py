@@ -27,6 +27,26 @@ def calculate(numbers: list):
     sum = getSum(numbers)
     max, min = getMaxMin(numbers)
     matrix = [['#' for j in range(sum)] for i in range(max + min + sizePerson)]
+
+    isUp = True
+    i = len(matrix) - min - 1
+    j = 0
+    iStartPersone = 0
+    JStartPersone = 0
+    for k in range(len(numbers)):
+        if k % 2 == 0:
+            for p in range(numbers[k] - 1):
+                matrix[i][j] = '/'
+                i -= 1
+                j += 1
+            matrix[i][j] = '/'
+        else:
+            for p in range(numbers[k] - 1):
+                matrix[i][j] = '\\'
+                i += 1
+                j += 1
+            matrix[i][j] = '\\'
+        j += 1
     PringMatrix(matrix)
 
 def main():
