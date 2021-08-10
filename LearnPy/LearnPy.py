@@ -22,6 +22,15 @@ def getSum(numbers: list):
         sum += i
     return sum
 
+def addPerson(matrix, i, j):
+     matrix[i - 1][j] = 'o'
+     matrix[i][j] = '|'
+     matrix[i][j - 1] = '/'
+     matrix[i][j + 1] = '\\'
+     matrix[i + 1][j - 1] = '<'
+     matrix[i + 1][j] = ' '
+     matrix[i + 1][j + 1] = '>'
+
 def calculate(numbers: list):
     sizePerson = 3
     sum = getSum(numbers)
@@ -32,7 +41,7 @@ def calculate(numbers: list):
     i = len(matrix) - min - 1
     j = 0
     iStartPersone = 0
-    JStartPersone = 0
+    jStartPersone = 0
     for k in range(len(numbers)):
         if k % 2 == 0:
             for p in range(numbers[k] - 1):
@@ -47,15 +56,28 @@ def calculate(numbers: list):
                 j += 1
             matrix[i][j] = '\\'
         j += 1
+        if i == sizePerson:
+            j += 1
+            iStartPersone = i - 1
+            jStartPersone = j - 1
+    PringMatrix(matrix)
+
+    matrix[iStartPersone - 1][jStartPersone] = 'o'
+    matrix[iStartPersone][jStartPersone] = '|'
+    matrix[iStartPersone][jStartPersone - 1] = '/'
+    matrix[iStartPersone][jStartPersone + 1] = '\\'
+    matrix[iStartPersone + 1][jStartPersone - 1] = '<'
+    matrix[iStartPersone + 1][jStartPersone] = ' '
+    matrix[iStartPersone + 1][jStartPersone + 1] = '>'
+
     PringMatrix(matrix)
 
 def main():
-    numbers = [1,2,3,4,5]
-    #numbers = [2,15,18,5,16,17,10,1,19,2,1,16,14,1,16,2,5,13,11,10]
-    #userInput = input().split(' ')
-    #for i in userInput:
-    #    numbers.append(int(i))
-    #numbers = input().split(' ')
+    numbers = [2,15,18,5,16,17,10,1,19,2,1,16,14,1,16,2,5,13,11,10]
+    userInput = input().split(' ')
+    for i in userInput:
+        numbers.append(int(i))
+    numbers = input().split(' ')
     calculate(numbers)
 
 if __name__ == "__main__":
