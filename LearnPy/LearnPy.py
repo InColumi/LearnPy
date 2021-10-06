@@ -1,68 +1,84 @@
-import ctypes
-import time
+def PringMatrix(matrix):
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            print(matrix[i][j], end='')
+        print()
 
-SendInput = ctypes.windll.user32.SendInput
+def getMaxMin(numbers: list):
+    sum = 0
+    max = sum
+    min = sum
+    for i in range(len(numbers)):
+        sum += numbers[i] if i % 2 == 0 else -numbers[i]
+        if max < sum:
+            max = sum
+        if min > sum:
+            min = sum
+    return [max,abs(min)]
 
-# C struct redefinitions 
-PUL = ctypes.POINTER(ctypes.c_ulong)
-class KeyBdInput(ctypes.Structure):
-    _fields_ = [("wVk", ctypes.c_ushort),
-                ("wScan", ctypes.c_ushort),
-                ("dwFlags", ctypes.c_ulong),
-                ("time", ctypes.c_ulong),
-                ("dwExtraInfo", PUL)]
+def getSum(numbers: list):
+    sum = 0
+    for i in numbers:
+        sum += i
+    return sum
 
-class HardwareInput(ctypes.Structure):
-    _fields_ = [("uMsg", ctypes.c_ulong),
-                ("wParamL", ctypes.c_short),
-                ("wParamH", ctypes.c_ushort)]
+def addPerson(matrix, i, j):
+     matrix[i - 1][j] = 'o'
+     matrix[i][j] = '|'
+     matrix[i][j - 1] = '/'
+     matrix[i][j + 1] = '\\'
+     matrix[i + 1][j - 1] = '<'
+     matrix[i + 1][j] = ' '
+     matrix[i + 1][j + 1] = '>'
 
-class MouseInput(ctypes.Structure):
-    _fields_ = [("dx", ctypes.c_long),
-                ("dy", ctypes.c_long),
-                ("mouseData", ctypes.c_ulong),
-                ("dwFlags", ctypes.c_ulong),
-                ("time",ctypes.c_ulong),
-                ("dwExtraInfo", PUL)]
+def calculate(numbers: list):
+    sizePerson = 3
+    sum = getSum(numbers)
+    max, min = getMaxMin(numbers)
+    matrix = [['#' for j in range(sum)] for i in range(max + min + sizePerson)]
 
-class Input_I(ctypes.Union):
-    _fields_ = [("ki", KeyBdInput),
-                 ("mi", MouseInput),
-                 ("hi", HardwareInput)]
+    isUp = True
+    i = len(matrix) - min - 1
+    j = 0
+    iStartPersone = 0
+    jStartPersone = 0
+    for k in range(len(numbers)):
+        if k % 2 == 0:
+            for p in range(numbers[k] - 1):
+                matrix[i][j] = '/'
+                i -= 1
+                j += 1
+            matrix[i][j] = '/'
+        else:
+            for p in range(numbers[k] - 1):
+                matrix[i][j] = '\\'
+                i += 1
+                j += 1
+            matrix[i][j] = '\\'
+        j += 1
+        if i == sizePerson:
+            j += 1
+            iStartPersone = i - 1
+            jStartPersone = j - 1
+    PringMatrix(matrix)
 
-class Input(ctypes.Structure):
-    _fields_ = [("type", ctypes.c_ulong),
-                ("ii", Input_I)]
+    matrix[iStartPersone - 1][jStartPersone] = 'o'
+    matrix[iStartPersone][jStartPersone] = '|'
+    matrix[iStartPersone][jStartPersone - 1] = '/'
+    matrix[iStartPersone][jStartPersone + 1] = '\\'
+    matrix[iStartPersone + 1][jStartPersone - 1] = '<'
+    matrix[iStartPersone + 1][jStartPersone] = ' '
+    matrix[iStartPersone + 1][jStartPersone + 1] = '>'
 
-# Actuals Functions
+    PringMatrix(matrix)
 
-def PressKey(hexKeyCode):
-    extra = ctypes.c_ulong(0)
-    ii_ = Input_I()
-    ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra) )
-    x = Input( ctypes.c_ulong(1), ii_ )
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+def main():
+    numbers = [2,15,18,5,16,17,10,1,19,2,1,16,14,1,16,2,5,13,11,10]
+    userInput = input().split(' ')
+    for i in userInput:
+        numbers.append(int(i))
+    numbers = input().split(' ')
+    calculate(numbers)
 
-def ReleaseKey(hexKeyCode):
-    extra = ctypes.c_ulong(0)
-    ii_ = Input_I()
-    ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra) )
-    x = Input( ctypes.c_ulong(1), ii_ )
-    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
-
-
-count = 0
-while (True):
-    #hexKey = 51 # клавиша ,>
-    hexKey = 52 # клавиша ,>
-    #for i in range(1, 100):
-        #hexKey += 1
-    PressKey(51) # клавиша .>
-    PressKey(52)
-    time.sleep(0.5)
-    #ReleaseKey(hexKey)
-    #time.sleep(0.01)
-    print("pressed: ", count)
-    count += 1
-    #PressKey(0xBC) # клавиша ,<
-    
+if __name__ == "__main__":
+    main()
