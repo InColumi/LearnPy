@@ -1,53 +1,68 @@
-import keyboard
-import pyautogui
+import ctypes
+import time
 
-def test1():
-    while keyboard.is_pressed('<'):
-        pyautogui.click(button='middle')
-        print("Pressed: <")
+SendInput = ctypes.windll.user32.SendInput
 
-#def test1():
-#    while keyboard.is_pressed('u') == False:
-#        PressKey(51) # клавиша ,<
-#        time.sleep(0.0001)
-#        ReleaseKey(51)
-#        print("Pressed: <")
+# C struct redefinitions 
+PUL = ctypes.POINTER(ctypes.c_ulong)
+class KeyBdInput(ctypes.Structure):
+    _fields_ = [("wVk", ctypes.c_ushort),
+                ("wScan", ctypes.c_ushort),
+                ("dwFlags", ctypes.c_ulong),
+                ("time", ctypes.c_ulong),
+                ("dwExtraInfo", PUL)]
 
-#def test1():
-#    isPressed = True
-#    while isPressed:
-#        PressKey(51) # клавиша ,<
-#        time.sleep(0.0001)
-#        ReleaseKey(51)
-#        time.sleep(0.0001)
-#        if keyboard.is_pressed('<'):
-#            isPressed = False
-#        print("Pressed: <")
+class HardwareInput(ctypes.Structure):
+    _fields_ = [("uMsg", ctypes.c_ulong),
+                ("wParamL", ctypes.c_short),
+                ("wParamH", ctypes.c_ushort)]
 
-def test2():
-    while keyboard.is_pressed('>') == False:
-        pyautogui.click(button='right')
-        print("Pressed: >")
+class MouseInput(ctypes.Structure):
+    _fields_ = [("dx", ctypes.c_long),
+                ("dy", ctypes.c_long),
+                ("mouseData", ctypes.c_ulong),
+                ("dwFlags", ctypes.c_ulong),
+                ("time",ctypes.c_ulong),
+                ("dwExtraInfo", PUL)]
 
-#def test2():
-#    while keyboard.is_pressed('u') == False:
-#        PressKey(52) # клавиша ,<
-#        time.sleep(0.0001)
-#        ReleaseKey(52)
-#        print("Pressed: >")
+class Input_I(ctypes.Union):
+    _fields_ = [("ki", KeyBdInput),
+                 ("mi", MouseInput),
+                 ("hi", HardwareInput)]
 
-#def test2():
-#     isPressed = True
-#     while isPressed:
-#        PressKey(52) # клавиша ,<
-#        time.sleep(0.0001)
-#        ReleaseKey(52)
-#        time.sleep(0.0001)
-#        if keyboard.is_pressed('ctrl'):
-#            break
-#        print("Pressed: >")
- 
-if __name__ == '__main__':
-    keyboard.add_hotkey('<',test1)
-    keyboard.add_hotkey('>',test2)
-    keyboard.wait()
+class Input(ctypes.Structure):
+    _fields_ = [("type", ctypes.c_ulong),
+                ("ii", Input_I)]
+
+# Actuals Functions
+
+def PressKey(hexKeyCode):
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra) )
+    x = Input( ctypes.c_ulong(1), ii_ )
+    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+def ReleaseKey(hexKeyCode):
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra) )
+    x = Input( ctypes.c_ulong(1), ii_ )
+    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
+
+
+count = 0
+while (True):
+    #hexKey = 51 # клавиша ,>
+    hexKey = 52 # клавиша ,>
+    #for i in range(1, 100):
+        #hexKey += 1
+    PressKey(51) # клавиша .>
+    PressKey(52)
+    time.sleep(0.5)
+    #ReleaseKey(hexKey)
+    #time.sleep(0.01)
+    print("pressed: ", count)
+    count += 1
+    #PressKey(0xBC) # клавиша ,<
+    
