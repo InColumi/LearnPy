@@ -1,84 +1,51 @@
-def PringMatrix(matrix):
-    for i in range(len(matrix)):
-        for j in range(len(matrix[0])):
-            print(matrix[i][j], end='')
-        print()
+import shutil
+import os
+import pandas as pd
 
-def getMaxMin(numbers: list):
-    sum = 0
-    max = sum
-    min = sum
-    for i in range(len(numbers)):
-        sum += numbers[i] if i % 2 == 0 else -numbers[i]
-        if max < sum:
-            max = sum
-        if min > sum:
-            min = sum
-    return [max,abs(min)]
+currentPath = os.getcwd()
+dirWithAudio = "log.txt"
 
-def getSum(numbers: list):
-    sum = 0
-    for i in numbers:
-        sum += i
-    return sum
+data = pd.read_excel('БАЗА АУДИО.xlsx', sheet_name=0)
 
-def addPerson(matrix, i, j):
-     matrix[i - 1][j] = 'o'
-     matrix[i][j] = '|'
-     matrix[i][j - 1] = '/'
-     matrix[i][j + 1] = '\\'
-     matrix[i + 1][j - 1] = '<'
-     matrix[i + 1][j] = ' '
-     matrix[i + 1][j + 1] = '>'
+def getListFromData(nameData):
+	isNotNull = pd.notnull(data[nameData])
+	items = data.loc[isNotNull,nameData]
+	
+	items = [str(item).strip().replace("-", "").replace("(", "").replace(")", "").replace(" ", "") for item in items]
+	res = []
+	for item in items:
+		if item.isdigit():
+			res.append(item)
 
-def calculate(numbers: list):
-    sizePerson = 3
-    sum = getSum(numbers)
-    max, min = getMaxMin(numbers)
-    matrix = [['#' for j in range(sum)] for i in range(max + min + sizePerson)]
+	return res
 
-    isUp = True
-    i = len(matrix) - min - 1
-    j = 0
-    iStartPersone = 0
-    jStartPersone = 0
-    for k in range(len(numbers)):
-        if k % 2 == 0:
-            for p in range(numbers[k] - 1):
-                matrix[i][j] = '/'
-                i -= 1
-                j += 1
-            matrix[i][j] = '/'
-        else:
-            for p in range(numbers[k] - 1):
-                matrix[i][j] = '\\'
-                i += 1
-                j += 1
-            matrix[i][j] = '\\'
-        j += 1
-        if i == sizePerson:
-            j += 1
-            iStartPersone = i - 1
-            jStartPersone = j - 1
-    PringMatrix(matrix)
+teletel = "Teletel"
+ozon = "OZON"
+colCetre = "Call-Cetre"
+yandexRec = "ЯндексРекрутеры"
+yandexKC = "ЯндексКЦ"
 
-    matrix[iStartPersone - 1][jStartPersone] = 'o'
-    matrix[iStartPersone][jStartPersone] = '|'
-    matrix[iStartPersone][jStartPersone - 1] = '/'
-    matrix[iStartPersone][jStartPersone + 1] = '\\'
-    matrix[iStartPersone + 1][jStartPersone - 1] = '<'
-    matrix[iStartPersone + 1][jStartPersone] = ' '
-    matrix[iStartPersone + 1][jStartPersone + 1] = '>'
+result = getListFromData(yandexRec)
 
-    PringMatrix(matrix)
+def MovePhoneNumbersFromFolder(numbers, nameFolder):
+	try:
+	    os.mkdir(nameFolder)
+	except OSError:
+	    print ("Создать директорию %s не удалось" % nameFolder)
+	else:
+	    print ("Успешно создана директория %s " % nameFolder)
+	lines = open(dirWithAudio, 'r').readlines()
+	logFileName = "Log File %s.txt" % nameFolder
+	logFile = open(logFileName, 'w')
+	countLines = len(lines)
+	for number in result:
+		for line in lines:
+			if line.find(number) != -1:
+				logFile.write(line)
+				newFile = open(currentPath + "\\" + nameFolder + "\\" + number + ".txt", "w")
+				newFile.close()
+				print(countLines, "\\", countLines , line, end='')
+			countLines += 1
+	logFile.close()
 
-def main():
-    numbers = [2,15,18,5,16,17,10,1,19,2,1,16,14,1,16,2,5,13,11,10]
-    userInput = input().split(' ')
-    for i in userInput:
-        numbers.append(int(i))
-    numbers = input().split(' ')
-    calculate(numbers)
-
-if __name__ == "__main__":
-    main()
+MovePhoneNumbersFromFolder(getListFromData(yandexRec), "Teletel")
