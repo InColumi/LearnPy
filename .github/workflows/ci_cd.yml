@@ -1,6 +1,10 @@
 name: Example CI CD by Panov
 
-on: [push]
+on:
+  push:
+    branches:
+    - master
+    - panov
 
 jobs:
   build:
