@@ -3,7 +3,7 @@ on:
   push:
     branches:
     - master
-    - main
+    - panov
     
 jobs:
   build-job:
