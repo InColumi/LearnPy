@@ -1,6 +1,9 @@
 name: Example CI CD by Panov
-on:
-  push:
-    branches:
-    - master
-    - panov
+on: [push]
+jobs:
+  my_first_job:
+    runs-on: ubuntu-latest
+    name: My first job
+  my_second_job:
+    runs-on: ubuntu-latest
+    name: My second job
