@@ -1,9 +1,7 @@
 name: Example CI CD by Panov
 on:
   push:
-    branches:
-    - main
-    - panov
+    branches: [ "panov" ]
     
 jobs:
   build-job:
