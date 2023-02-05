@@ -3,7 +3,7 @@ name: Example CI CD by Panov
 on:
   push:
     branches:
-    - panov
+    - '*'
   pull_request:
     branches:    
       - main
